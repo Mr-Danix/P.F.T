@@ -18,7 +18,7 @@ Easy to Use with a clean, modern interface
 
 ## 🚀 Live Demo
 
-Check it out here: Your GitHub Pages Link
+Check it out here: Your GitHub Pages Link https://mr-danix.github.io/P.F.T/
 
 ## 🛠️ Technologies Used
 
