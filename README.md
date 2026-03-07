@@ -1,8 +1,8 @@
-💰 Personal Financial Tracker
+## 💰 Personal Financial Tracker
 
 Track your income, expenses, and savings effortlessly with this intuitive web app! Keep your finances organized and make smarter financial decisions.
 
-🌟 Features
+## 🌟 Features
 
 Add, Edit, and Delete income and expenses
 
@@ -16,11 +16,11 @@ Easy to Use with a clean, modern interface
 
 
 
-🚀 Live Demo
+## 🚀 Live Demo
 
 Check it out here: Your GitHub Pages Link
 
-🛠️ Technologies Used
+## 🛠️ Technologies Used
 
 Frontend: HTML, CSS, JavaScript
 
@@ -28,7 +28,7 @@ Storage: LocalStorage (for data persistence)
 
 Charts: Chart.js for data visualization
 
-📈 How to Use
+## 📈 How to Use
 
 Open the web app in your browser
 
@@ -38,6 +38,6 @@ View your spending trends in interactive charts
 
 Monitor your monthly summary and adjust your budget accordingly
 
-🤝 Contributing
+## 🤝 Contributing
 
 Feel free to fork the repo, create issues, or submit pull requests. Suggestions and improvements are always welcome!
