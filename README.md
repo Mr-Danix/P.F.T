@@ -14,7 +14,7 @@ Responsive Design – works on both desktop and mobile
 
 Easy to Use with a clean, modern interface
 
-🖼️ Screenshot
+
 
 🚀 Live Demo
 
