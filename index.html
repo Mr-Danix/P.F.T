@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Finance Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in { animation: fadeInUp 0.6s ease-out forwards; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+
+        #authForms { transition: transform 0.6s cubic-bezier(0.7, 0, 0.3, 1); }
+        
+        .input-field {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .input-field:focus {
+            border-color: #6366f1;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Hide Scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-[#f8fafc] min-h-screen text-slate-900 overflow-x-hidden">
+
+    <div id="authOverlay" class="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-xl flex items-center justify-center transition-all duration-700">
+        <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-[420px] overflow-hidden relative m-4 border border-white/20">
+            
+            <div class="flex p-2 bg-slate-100 m-6 rounded-2xl relative">
+                <div id="tabIndicator" class="absolute top-2 left-2 w-[calc(50%-8px)] h-[calc(100%-16px)] bg-white rounded-xl shadow-md transition-all duration-500"></div>
+                <button onclick="toggleAuth('login')" id="btnTabLogin" class="z-10 flex-1 py-3 font-bold text-sm text-indigo-600 transition-all">Login</button>
+                <button onclick="toggleAuth('register')" id="btnTabReg" class="z-10 flex-1 py-3 font-bold text-sm text-slate-400 transition-all">Register</button>
+            </div>
+
+            <div id="authForms" class="flex w-[200%]">
+                <form id="loginForm" class="w-1/2 p-8 pt-2 space-y-4">
+                    <div class="text-center mb-6">
+                        <h2 class="text-3xl font-extrabold tracking-tight">Welcome back</h2>
+                        <p class="text-slate-400 mt-2">Enter your details to continue</p>
+                    </div>
+                    <input type="email" id="loginEmail" placeholder="Email Address" required class="input-field w-full p-4 rounded-2xl bg-slate-100 outline-none">
+                    <input type="password" id="loginPass" placeholder="Password" required class="input-field w-full p-4 rounded-2xl bg-slate-100 outline-none">
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-[0.98] transition-all">Sign In</button>
+                </form>
+
+                <form id="registerForm" class="w-1/2 p-8 pt-2 space-y-4">
+                    <div class="text-center mb-6">
+                        <h2 class="text-3xl font-extrabold tracking-tight">Create Account</h2>
+                        <p class="text-slate-400 mt-2">Start your journey with us</p>
+                    </div>
+                    <input type="text" id="regName" placeholder="Full Name" required class="input-field w-full p-4 rounded-2xl bg-slate-100 outline-none">
+                    <input type="email" id="regEmail" placeholder="Email Address" required class="input-field w-full p-4 rounded-2xl bg-slate-100 outline-none">
+                    <input type="password" id="regPass" placeholder="Create Password" required class="input-field w-full p-4 rounded-2xl bg-slate-100 outline-none">
+                    <button type="submit" class="w-full bg-emerald-500 text-white py-4 rounded-2xl font-bold shadow-lg shadow-emerald-100 hover:bg-emerald-600 active:scale-[0.98] transition-all">Get Started</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <main id="mainApp" class="max-w-7xl mx-auto p-4 md:p-10 opacity-0 transition-opacity duration-1000">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-12">
+            <div class="animate-in">
+                <h1 class="text-4xl font-black text-slate-900">Personal <span class="text-indigo-600">Finance Tracker</span></h1>
+                <p id="userGreeting" class="text-slate-500 font-medium mt-1">Good morning, User</p>
+            </div>
+            <div class="flex items-center gap-3 animate-in delay-1">
+                <button onclick="logout()" class="group flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 rounded-2xl font-bold text-slate-600 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-100 transition-all shadow-sm">
+                    Logout
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7" /></svg>
+                </button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="glass-card p-8 rounded-[2rem] animate-in delay-1">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Available Balance</p>
+                <h2 id="totalBalance" class="text-4xl font-extrabold mt-2">$0.00</h2>
+            </div>
+            <div class="glass-card p-8 rounded-[2rem] animate-in delay-2 border-b-4 border-emerald-500">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Income</p>
+                <h2 id="totalIncome" class="text-4xl font-extrabold mt-2 text-emerald-600">$0.00</h2>
+            </div>
+            <div class="glass-card p-8 rounded-[2rem] animate-in delay-1 border-b-4 border-rose-500">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Expenses</p>
+                <h2 id="totalExpenses" class="text-4xl font-extrabold mt-2 text-rose-600">$0.00</h2>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-4 space-y-8">
+                <div class="glass-card p-8 rounded-[2rem] animate-in delay-2">
+                    <h3 class="text-xl font-bold mb-6">Add Transaction</h3>
+                    <form id="transactionForm" class="space-y-4">
+                        <input type="text" id="desc" placeholder="Description" required class="input-field w-full p-4 rounded-xl bg-slate-50 outline-none text-sm">
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="number" id="amount" placeholder="Amount" step="0.01" required class="input-field w-full p-4 rounded-xl bg-slate-50 outline-none text-sm">
+                            <select id="type" class="input-field w-full p-4 rounded-xl bg-slate-50 outline-none text-sm font-semibold">
+                                <option value="expense">Expense</option>
+                                <option value="income">Income</option>
+                            </select>
+                        </div>
+                        <select id="category" class="input-field w-full p-4 rounded-xl bg-slate-50 outline-none text-sm font-semibold">
+                            <option value="Food">🍔 Food</option>
+                            <option value="Rent">🏠 Rent</option>
+                            <option value="Salary">💰 Salary</option>
+                            <option value="Leisure">🎨 Leisure</option>
+                            <option value="Transport">🚗 Transport</option>
+                        </select>
+                        <input type="date" id="date" required class="input-field w-full p-4 rounded-xl bg-slate-50 outline-none text-sm">
+                        <button type="submit" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-black transition-all shadow-lg active:scale-95">Record Entry</button>
+                    </form>
+                </div>
+
+                <div class="glass-card p-8 rounded-[2rem] animate-in delay-2">
+                    <h3 class="text-xl font-bold mb-6">Spending Analysis</h3>
+                    <canvas id="categoryChart" class="max-h-[250px]"></canvas>
+                </div>
+            </div>
+
+            <div class="lg:col-span-8">
+                <div class="glass-card p-8 rounded-[2rem] min-h-[600px] animate-in delay-1">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                        <h3 class="text-xl font-bold">Transaction History</h3>
+                        <div class="flex gap-2 w-full md:w-auto">
+                            <input type="text" id="search" onkeyup="renderTransactions()" placeholder="Search..." class="p-3 px-5 rounded-xl border border-slate-100 bg-slate-50 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-indigo-100 transition-all">
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto no-scrollbar">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="text-slate-400 text-xs uppercase tracking-widest border-b border-slate-100">
+                                    <th class="pb-4 font-bold">Transaction</th>
+                                    <th class="pb-4 font-bold">Category</th>
+                                    <th class="pb-4 font-bold">Date</th>
+                                    <th class="pb-4 font-bold text-right">Amount</th>
+                                    <th class="pb-4 font-bold text-center"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionList" class="text-sm">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // GLOBAL STATE
+        let users = JSON.parse(localStorage.getItem('finance_users')) || [];
+        let currentUser = JSON.parse(localStorage.getItem('current_user')) || null;
+        let transactions = [];
+        let myChart = null;
+
+        // AUTH UI TOGGLE
+        function toggleAuth(mode) {
+            const formPanel = document.getElementById('authForms');
+            const indicator = document.getElementById('tabIndicator');
+            const btnLogin = document.getElementById('btnTabLogin');
+            const btnReg = document.getElementById('btnTabReg');
+
+            if (mode === 'register') {
+                formPanel.style.transform = 'translateX(-50%)';
+                indicator.style.left = 'calc(50% + 4px)';
+                btnReg.classList.replace('text-slate-400', 'text-indigo-600');
+                btnLogin.classList.replace('text-indigo-600', 'text-slate-400');
+            } else {
+                formPanel.style.transform = 'translateX(0%)';
+                indicator.style.left = '8px';
+                btnLogin.classList.replace('text-slate-400', 'text-indigo-600');
+                btnReg.classList.replace('text-indigo-600', 'text-slate-400');
+            }
+        }
+
+        // AUTH LOGIC
+        document.getElementById('registerForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = {
+                name: document.getElementById('regName').value,
+                email: document.getElementById('regEmail').value,
+                pass: document.getElementById('regPass').value,
+                data: []
+            };
+            if (users.find(u => u.email === user.email)) return alert("Email already registered!");
+            users.push(user);
+            localStorage.setItem('finance_users', JSON.stringify(users));
+            alert("Registration successful! You can now login.");
+            toggleAuth('login');
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPass').value;
+            const user = users.find(u => u.email === email && u.pass === pass);
+            
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('current_user', JSON.stringify(user));
+                checkAuth();
+            } else {
+                alert("Incorrect email or password");
+            }
+        });
+
+        function logout() {
+            saveData();
+            localStorage.removeItem('current_user');
+            currentUser = null;
+            location.reload(); 
+        }
+
+        function checkAuth() {
+            const overlay = document.getElementById('authOverlay');
+            const main = document.getElementById('mainApp');
+            if (currentUser) {
+                overlay.style.opacity = '0';
+                setTimeout(() => overlay.classList.add('hidden'), 500);
+                main.classList.remove('opacity-0');
+                document.getElementById('userGreeting').innerText = `Welcome back, ${currentUser.name.split(' ')[0]}!`;
+                transactions = currentUser.data || [];
+                init();
+            } else {
+                overlay.classList.remove('hidden');
+                main.classList.add('opacity-0');
+            }
+        }
+
+        // CORE APP LOGIC
+        function init() {
+            updateDashboard();
+            renderTransactions();
+            updateChart();
+        }
+
+        document.getElementById('transactionForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const t = {
+                id: Date.now(),
+                desc: document.getElementById('desc').value,
+                amount: parseFloat(document.getElementById('amount').value),
+                type: document.getElementById('type').value,
+                category: document.getElementById('category').value,
+                date: document.getElementById('date').value
+            };
+            transactions.push(t);
+            saveData();
+            e.target.reset();
+            document.getElementById('date').valueAsDate = new Date();
+            init();
+        });
+
+        function deleteTransaction(id) {
+            transactions = transactions.filter(t => t.id !== id);
+            saveData();
+            init();
+        }
+
+        function saveData() {
+            if (!currentUser) return;
+            const idx = users.findIndex(u => u.email === currentUser.email);
+            users[idx].data = transactions;
+            localStorage.setItem('finance_users', JSON.stringify(users));
+            localStorage.setItem('current_user', JSON.stringify(users[idx]));
+        }
+
+        function updateDashboard() {
+            const inc = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+            const exp = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+            document.getElementById('totalBalance').innerText = `$${(inc - exp).toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            document.getElementById('totalIncome').innerText = `+$${inc.toLocaleString()}`;
+            document.getElementById('totalExpenses').innerText = `-$${exp.toLocaleString()}`;
+        }
+
+        function renderTransactions() {
+            const list = document.getElementById('transactionList');
+            const search = document.getElementById('search').value.toLowerCase();
+            list.innerHTML = '';
+
+            transactions.filter(t => t.desc.toLowerCase().includes(search))
+                .sort((a,b) => new Date(b.date) - new Date(a.date))
+                .forEach(t => {
+                    const isInc = t.type === 'income';
+                    const row = document.createElement('tr');
+                    row.className = "group hover:bg-slate-50/50 transition-colors";
+                    row.innerHTML = `
+                        <td class="py-5 font-semibold text-slate-700">${t.desc}</td>
+                        <td class="py-5"><span class="px-3 py-1 bg-white border border-slate-100 rounded-full text-[10px] font-bold uppercase tracking-wider">${t.category}</span></td>
+                        <td class="py-5 text-slate-400 font-medium">${t.date}</td>
+                        <td class="py-5 text-right font-extrabold ${isInc ? 'text-emerald-500' : 'text-rose-500'}">
+                            ${isInc ? '+' : '-'}$${t.amount.toFixed(2)}
+                        </td>
+                        <td class="py-5 text-center">
+                            <button onclick="deleteTransaction(${t.id})" class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500 transition-all ml-4">✕</button>
+                        </td>
+                    `;
+                    list.appendChild(row);
+                });
+        }
+
+        function updateChart() {
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            const expenses = transactions.filter(t => t.type === 'expense');
+            const cats = [...new Set(expenses.map(t => t.category))];
+            const data = cats.map(c => expenses.filter(t => t.category === c).reduce((s, t) => s + t.amount, 0));
+
+            if (myChart) myChart.destroy();
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: cats,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: ['#6366f1', '#10b981', '#f43f5e', '#f59e0b', '#3b82f6'],
+                        hoverOffset: 20,
+                        borderWidth: 4,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    cutout: '75%',
+                    plugins: { legend: { display: true, position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { weight: 'bold' } } } }
+                }
+            });
+        }
+
+        // Initialize
+        document.getElementById('date').valueAsDate = new Date();
+        checkAuth();
+    </script>
+</body>
+</html>
