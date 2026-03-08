@@ -2,7 +2,7 @@
 
 Track your income, expenses, and savings effortlessly with this intuitive web app! Keep your finances organized and make smarter financial decisions.
 
-## 🌟 Features    
+## 🌟 Features   
 
 Add, Edit, and Delete income and expenses
 
