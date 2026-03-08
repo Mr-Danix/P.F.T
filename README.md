@@ -6,7 +6,7 @@ Track your income, expenses, and savings effortlessly with this intuitive web ap
 
 Add, Edit, and Delete income and expenses
 
-Visual Charts to monitor spending trend
+Visual Charts to monitor spending trends
 
 Monthly Summary showing total income, expenses, and savings
 
